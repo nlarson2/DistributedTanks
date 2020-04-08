@@ -1,0 +1,2 @@
+sudo nodemon src/server/server.js
+npm run [script]

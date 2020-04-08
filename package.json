@@ -1,0 +1,26 @@
+{
+  "name": "parceltest",
+  "version": "1.0.0",
+  "main": "src/client/index.js",
+  "scripts": {
+    "dev": "parcel src/client/index.html",
+    "prod": "parcel build src/client/index.html --public-url ./",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel-bundler": "^1.12.4",
+    "sass": "^1.26.3"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.2",
+    "parcel": "^1.12.4",
+    "socketio": "^1.0.0",
+    "throttle-debounce": "^2.1.0"
+  },
+  "description": ""
+}

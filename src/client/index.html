@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TANKS</title>
+    <link rel="stylesheet" href="./styles/main.css">
+    <link rel="stylesheet" href="./styles/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Black+Ops+One">
+</head>
+<body id="body" class="login-background">
+    <canvas id="game_canvas"></canvas>
+    <ul id = "PlayerList">
+    </ul>
+    <div id="play_menu">
+      <h1 class="display-3 text-center" style="font-family: 'Black Ops One', cursive; padding-top: 100px">Tank Game</h1>
+      <div class="login-clean">
+        <h2 class="sr-only">Login Form</h2>
+        <div class="container" style="width: 15%;">
+            <div class="col-sm">
+	            <div class="form-group ">
+                    <input class="form-control" type="text" id="in_game_name" name="in_game_name" placeholder="In game name">
+                </div>
+                <button id="play_button" class="btn btn-danger btn-block">Play</button>
+            </div>
+        </div>
+      </div>
+    </div>
+    <div id="leaderboard" class="hidden">
+    </div>
+    <div id="disconnect" class="hidden">
+    </div>
+    <div id="game_full" class="hidden">
+    </div>
+    <script src="./index.js"></script>
+  </body>
+</html>
