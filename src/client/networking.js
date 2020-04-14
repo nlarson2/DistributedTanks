@@ -43,8 +43,8 @@ function processUpdate(update) {
 
 export function sendMouseInput(event) {
     var playerInfo = {
-        x: me.x,
-        y: me.y,
+        x: me.x + Constants.PLAYER_HEIGHT * Math.sin(me.barrel_angle),
+        y: me.y - Constants.PLAYER_HEIGHT * Math.cos(me.barrel_angle),
         angle: me.barrel_angle
     }
     if (playerInfo.angle != undefined && playerInfo.x != undefined && playerInfo.y != undefined) {

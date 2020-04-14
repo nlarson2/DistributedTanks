@@ -8,15 +8,12 @@ module.exports = class Player {
         // give player random initial position within the map boundaries
         this.posx = 64*30 * (0.25 + Math.random() * 0.5);
         this.posy = 64*30 * (0.25 + Math.random() * 0.5);
-        //this.posx = -100;
-        //this.posy = -100;
         // angles are in radians
         this.tankAngle = 0;
         this.barrelAngle = 0;
         this.bullets = [];
-        /*this.moveToX = 0; this.moveToY = 0;
-        this.tankRot = 0; this.rotToTank = 0;
-        this.barrelRot = 0; this.rotToBarrel = 0;*/
+
+        this.score = 0;
     }
 
     toJSON() {
@@ -27,8 +24,39 @@ module.exports = class Player {
             y: this.posy,
             tank_angle: this.tankAngle,
             barrel_angle: this.barrelAngle,
-            bullets: this.bullets
+            bullets: this.bullets,
+            score: this.score
         };
     }
+    /*
+    getTankCorners() {
+        var cos = Math.cos(this.tankAngle);
+        var sin = Math.sin(this.tankAngle);
+        var W = Constants.PLAYER_WIDTH/2;
+        var H = Constants.PLAYER_HEIGHT/2;
+        var topMiddle = {x: this.posx + sin * H, 
+                        y: this.posy - cos * H};
+        var bottomMiddle = {x: this.posx - sin * H, 
+                            y: this.posy + cos * H};
+
+        var topRight = {x: topMiddle.x - cos * W,
+                        y: topMiddle.y - sin * W};
+
+        var topLeft = {x: topMiddle.x + cos * W,
+                       y: topMiddle.y + sin * W};
+
+        var bottomRight = {x: bottomMiddle.x + cos * W,
+                           y: bottomMiddle.y + sin * W};
+
+        var bottomLeft = {x: bottomMiddle.x - cos * W,
+                          y: bottomMiddle.y - sin * W};
+        return {
+            topRight: topRight,
+            topLeft: topLeft,
+            bottomRight: bottomRight,
+            bottomLeft: bottomLeft
+        }
+    }
+    */
 }
 

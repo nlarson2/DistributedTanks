@@ -51,9 +51,8 @@ module.exports = class Game {
         this.sockets[socket.id] = socket;
         this.players[socket.id] = new Player(socket.id, username);
         // player might spawn inside the wall, so just choose another spawn if it happens
-        while (this.checkPlayerWallCollisions(socket.id)) {
-            this.players[socket.id].posx = 64*30 * (0.25 + Math.random() * 0.5);
-            this.players[socket.id].posy = 64*30 * (0.25 + Math.random() * 0.5);
+        if (this.checkPlayerWallCollisions(socket.id)) {
+            this.respawnPlayer(this.players[socket.id]);
         }
     }
 
@@ -156,15 +155,46 @@ module.exports = class Game {
         return false;
     }
 
+    checkBulletPlayerCollisions(bullet) {
+        for (var i in this.players) {
+            // get coords of each corner of the player's tank body
+            var player_center = {x: this.players[i].posx, y: this.players[i].posy};
+            // rotate bullet about player center to realign with axes
+            var rotated_bullet = this.rotatePoint(bullet.posx, bullet.posy, -this.players[i].tankAngle, player_center);
+            // get player tank corners without rotation to realign with axes
+            var W = Constants.PLAYER_WIDTH/2;
+            var H = Constants.PLAYER_HEIGHT/2;
+            var corners = { topRight: {x: this.players[i].posx + W, y: this.players[i].posy + H},
+                            topLeft: {x: this.players[i].posx - W, y: this.players[i].posy + H},
+                            bottomRight: {x: this.players[i].posx + W, y: this.players[i].posy - H},
+                            bottomLeft: {x: this.players[i].posx - W, y: this.players[i].posy - H}}
+            var x = rotated_bullet.x;
+            var y = rotated_bullet.y;
+            
+            if (x < corners.topRight.x && x > corners.topLeft.x &&
+                y > corners.bottomRight.y && y < corners.topRight.y) {
+                // respawn hit player
+                this.respawnPlayer(this.players[i]);
+                return true;
+            }
+        }
+        return false;
+    }
+
     updateBullets() {
         for (var i in this.players) {
             var arr = []
             for (var j = 0; j < this.players[i].bullets.length; j++) {
-                // removes bullets that live too long
-                if (Math.floor((Date.now() - this.players[i].bullets[j].spawnTime)/1000) >= Constants.BULLET_LIFETIME) {
-                    // skip this loop iteration causing this bullet to be destroyed
+                // repawn hit player, increment score, and remove bullet that hits
+                if (this.checkBulletPlayerCollisions(this.players[i].bullets[j])) {
+                    this.players[i].score += 1;
                     continue
                 }
+                // removes bullets that live too long
+                if (Math.floor((Date.now() - this.players[i].bullets[j].spawnTime)/1000) >= Constants.BULLET_LIFETIME) {
+                    continue
+                }
+                // change player's x and check collision
                 var oldPosx = this.players[i].bullets[j].posx;
                 this.players[i].bullets[j].posx += Constants.BULLET_SPEED * Math.sin(this.players[i].bullets[j].angle);
                 if (this.checkBulletWallCollisions(this.players[i].bullets[j])) {
@@ -178,6 +208,7 @@ module.exports = class Game {
                     var angleChange = (0 - degrees*2) * Math.PI/180;
                     this.players[i].bullets[j].angle += angleChange;
                 }
+                // change player's y and check collision
                 var oldPosy = this.players[i].bullets[j].posy;
                 this.players[i].bullets[j].posy -= Constants.BULLET_SPEED * Math.cos(this.players[i].bullets[j].angle);
                 if (this.checkBulletWallCollisions(this.players[i].bullets[j])) {
@@ -196,5 +227,24 @@ module.exports = class Game {
             delete this.players[i].bullets;
             this.players[i].bullets = arr;
         }
+    }
+
+    rotatePoint(x, y, angle, center_of_rotation) {
+        var sin = Math.sin(angle);
+        var cos = Math.cos(angle);
+        x -= center_of_rotation.x;
+        y -= center_of_rotation.y;
+        var tempX = x * cos - y * sin;
+        var tempY = x * sin + y * cos;
+        return {x: tempX+center_of_rotation.x, y: tempY+center_of_rotation.y};
+    }
+
+    respawnPlayer(socket) {
+        this.players[socket.id].tankAngle = 0;
+        this.players[socket.id].barrelAngle = 0;
+        do {
+            this.players[socket.id].posx = 64*30 * (0.25 + Math.random() * 0.5);
+            this.players[socket.id].posy = 64*30 * (0.25 + Math.random() * 0.5);
+        } while (this.checkPlayerWallCollisions(socket.id));
     }
 }
