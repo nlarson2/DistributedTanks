@@ -3,3 +3,6 @@ sudo nodemon src/server/server.js
 
 Run this to build changes made on the client side:
 npm run [script]
+  - npm run prod
+  - npm run dev
+    - scripts can be found in package.json
