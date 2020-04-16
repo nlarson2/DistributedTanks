@@ -8,15 +8,11 @@ module.exports = class Player {
         // give player random initial position within the map boundaries
         this.posx = 64*30 * (0.25 + Math.random() * 0.5);
         this.posy = 64*30 * (0.25 + Math.random() * 0.5);
-        //this.posx = -100;
-        //this.posy = -100;
         // angles are in radians
         this.tankAngle = 0;
         this.barrelAngle = 0;
         this.bullets = [];
-        /*this.moveToX = 0; this.moveToY = 0;
-        this.tankRot = 0; this.rotToTank = 0;
-        this.barrelRot = 0; this.rotToBarrel = 0;*/
+        this.score = 0;
     }
 
     toJSON() {
@@ -27,7 +23,8 @@ module.exports = class Player {
             y: this.posy,
             tank_angle: this.tankAngle,
             barrel_angle: this.barrelAngle,
-            bullets: this.bullets
+            bullets: this.bullets,
+            score: this.score
         };
     }
 }

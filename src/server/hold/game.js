@@ -7,7 +7,7 @@ var Constants = require('../shared/constants.js');
 
 module.exports = class Game {
     constructor() {
-        //this.sockets = {};
+        this.sockets = {};
         this.players = {};
         this.map = {
             cols: 30,
@@ -47,70 +47,70 @@ module.exports = class Game {
             ]
         };
     }
-    addPlayer(id, username) {
-        //this.sockets[socket.id] = socket;
-        this.players[id] = new Player(id, username);
+    addPlayer(socket, username) {
+        this.sockets[socket.id] = socket;
+        this.players[socket.id] = new Player(socket.id, username);
         // player might spawn inside the wall, so just choose another spawn if it happens
-        if (this.checkPlayerWallCollisions(id)) {
-            this.respawnPlayer(this.players[id]);
+        if (this.checkPlayerWallCollisions(socket.id)) {
+            this.respawnPlayer(this.players[socket.id]);
         }
     }
 
-    removePlayer(id) {
-        //delete this.sockets[id];
-        delete this.players[id];
+    removePlayer(socket) {
+        delete this.sockets[socket.id];
+        delete this.players[socket.id];
     }
 
-    handleKBInput(id, inputs) {
-        this.players[id].barrelAngle = inputs.mouseAngle;
+    handleKBInput(socket, inputs) {
+        this.players[socket.id].barrelAngle = inputs.mouseAngle;
         if (inputs.right) {
-            var angle = this.players[id].tankAngle + Constants.PLAYER_TURN_SPEED * Math.PI/180;
+            var angle = this.players[socket.id].tankAngle + Constants.PLAYER_TURN_SPEED * Math.PI/180;
             if (angle > Constants.MAX_ANGLE) {
                 angle = Constants.MIN_ANGLE;
             }
             if (angle < Constants.MIN_ANGLE) {
                 angle = Constants.MAX_ANGLE;
             }
-            this.players[id].tankAngle = angle;
+            this.players[socket.id].tankAngle = angle;
         }
         if (inputs.left) {
-            var angle = this.players[id].tankAngle - Constants.PLAYER_TURN_SPEED * Math.PI/180;
+            var angle = this.players[socket.id].tankAngle - Constants.PLAYER_TURN_SPEED * Math.PI/180;
             if (angle > Constants.MAX_ANGLE) {
                 angle = Constants.MIN_ANGLE;
             }
             if (angle < Constants.MIN_ANGLE) {
                 angle = Constants.MAX_ANGLE;
             }
-            this.players[id].tankAngle = angle;
+            this.players[socket.id].tankAngle = angle;
         }
         if (inputs.forward) {
-            var oldPosx = this.players[id].posx;
-            this.players[id].posx += Constants.PLAYER_SPEED * Math.sin(this.players[id].tankAngle);
-            if(this.checkPlayerWallCollisions(id)) {
-                this.players[id].posx = oldPosx;
+            var oldPosx = this.players[socket.id].posx;
+            this.players[socket.id].posx += Constants.PLAYER_SPEED * Math.sin(this.players[socket.id].tankAngle);
+            if(this.checkPlayerWallCollisions(socket.id)) {
+                this.players[socket.id].posx = oldPosx;
             }
-            var oldPosy = this.players[id].posy;
-            this.players[id].posy -= Constants.PLAYER_SPEED * Math.cos(this.players[id].tankAngle);
-            if(this.checkPlayerWallCollisions(id)) {
-                this.players[id].posy = oldPosy;
+            var oldPosy = this.players[socket.id].posy;
+            this.players[socket.id].posy -= Constants.PLAYER_SPEED * Math.cos(this.players[socket.id].tankAngle);
+            if(this.checkPlayerWallCollisions(socket.id)) {
+                this.players[socket.id].posy = oldPosy;
             }
         }
         if (inputs.backward) {
-            var oldPosx = this.players[id].posx;
-            this.players[id].posx -= Constants.PLAYER_SPEED * Math.sin(this.players[id].tankAngle);
-            if(this.checkPlayerWallCollisions(id)) {
-                this.players[id].posx = oldPosx;
+            var oldPosx = this.players[socket.id].posx;
+            this.players[socket.id].posx -= Constants.PLAYER_SPEED * Math.sin(this.players[socket.id].tankAngle);
+            if(this.checkPlayerWallCollisions(socket.id)) {
+                this.players[socket.id].posx = oldPosx;
             }
-            var oldPosy = this.players[id].posy;
-            this.players[id].posy += Constants.PLAYER_SPEED * Math.cos(this.players[id].tankAngle);
-            if(this.checkPlayerWallCollisions(id)) {
-                this.players[id].posy = oldPosy;
+            var oldPosy = this.players[socket.id].posy;
+            this.players[socket.id].posy += Constants.PLAYER_SPEED * Math.cos(this.players[socket.id].tankAngle);
+            if(this.checkPlayerWallCollisions(socket.id)) {
+                this.players[socket.id].posy = oldPosy;
             }
         }
     }
 
-    handleMouseInput(id, inputs) {
-        this.players[id].bullets.push(new Bullet(this.players[id].barrelAngle, this.players[id].posx, this.players[id].posy, Date.now()));
+    handleMouseInput(socket, inputs) {
+        this.players[socket.id].bullets.push(new Bullet(inputs.angle, inputs.x, inputs.y, Date.now()));
     }
     /*
     // unoptimized wall collisions: checks all tiles in the map
@@ -192,9 +192,9 @@ module.exports = class Game {
                 }
                 // removes bullets that live too long
                 if (Math.floor((Date.now() - this.players[i].bullets[j].spawnTime)/1000) >= Constants.BULLET_LIFETIME) {
-                    // skip this loop iteration causing this bullet to be destroyed
                     continue
                 }
+                // change player's x and check collision
                 var oldPosx = this.players[i].bullets[j].posx;
                 this.players[i].bullets[j].posx += Constants.BULLET_SPEED * Math.sin(this.players[i].bullets[j].angle);
                 if (this.checkBulletWallCollisions(this.players[i].bullets[j])) {
@@ -208,6 +208,7 @@ module.exports = class Game {
                     var angleChange = (0 - degrees*2) * Math.PI/180;
                     this.players[i].bullets[j].angle += angleChange;
                 }
+                // change player's y and check collision
                 var oldPosy = this.players[i].bullets[j].posy;
                 this.players[i].bullets[j].posy -= Constants.BULLET_SPEED * Math.cos(this.players[i].bullets[j].angle);
                 if (this.checkBulletWallCollisions(this.players[i].bullets[j])) {

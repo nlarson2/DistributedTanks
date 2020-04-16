@@ -130,9 +130,9 @@ function renderLeaderboard() {
     for (var x in players) {
         y_spacing+=20;
         if (x == me.socket_id) {
-            context.fillText('*' + players[x].name + '* - ' + players[x].score, x_spacing, y_spacing);
+            context.fillText('*' + players[x].name + '*', x_spacing, y_spacing);
         } else {
-            context.fillText(players[x].name + ' - ' + players[x].score, x_spacing, y_spacing);
+            context.fillText(players[x].name, x_spacing, y_spacing);
         }
     }
 }

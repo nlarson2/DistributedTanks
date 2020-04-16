@@ -1,0 +1,125 @@
+const path = require("path")
+const cluster = require("cluster")
+const numCPUs = require('os').cpus().length;
+//const Game = require("Game")
+
+
+sockets = {};
+
+var maxPlayerCount = 8;
+
+module.exports = class ClusterManager {
+    constructor(){
+        this.length = 0;
+        this.inWorker = {};
+        cluster.setupMaster({
+            exec: './src/server/worker.js'
+        });
+    }
+    
+    //create a new process to handle a game //code at bottom
+    StartServer(arg) {
+        //add args to setupMaster for different games
+        cluster.setupMaster({
+            exec: './src/server/worker.js'
+        });
+        var worker = cluster.fork();
+        this.length++;
+        console.log("STARTED: " + this.length)
+        this.inWorker[this.length] = 0
+
+        worker.on("message", function(msg){
+            //console.log(msg.id)
+            switch(msg.msgType) {
+                case "login":
+                    console.log("In worker.on(): " + sockets + msg.id)
+                    sockets[msg.id].emit('mapUpdate', JSON.stringify(msg.map));
+                    break;
+                case "update":
+                    for(var id in msg.players) {
+                        sockets[id].emit("update", JSON.stringify(msg));
+                    }
+                    break;
+                default:
+                    console.log("YOU FUCKED UP");
+                    break;
+            }
+        })
+    }
+    //kill a server
+    CloseServer(id) {
+        for(var workerID in cluster.workers) {
+            if(workerID == id) {
+                cluster.workers[workerID].kill();
+                this.length--;
+            }
+        }
+    }
+    GetServers() {
+        if(cluster.isMaster) {
+            var workerIDs = []
+            for (const id in cluster.workers) {
+                workerIDs.push(id)
+            }
+            return workerIDs
+        }
+    }
+    GetCluster(){
+        return cluster
+    }
+
+    pickWorker() {
+        //return newest server for now
+        return this.length;
+    }
+
+    allocatePlayer(socket, msg) {
+        var workerID = this.pickWorker();
+        if (this.length < 1 || this.inWorker[workerID] >= maxPlayerCount) {
+            this.StartServer();
+            workerID = this.pickWorker();
+        }
+        var sendMsg = { 
+                    id: socket.id,//socket['conn']),
+                    name: msg,
+                    msgType: "login"
+                  };
+        //var outMsg = JSON.stringify(sendMsg);
+        //console.log(outMsg);
+        sockets[socket.id] = socket;
+        console.log("In AllocatePlayer: "+ sockets[socket.id.toString()] + socket.id);
+        cluster.workers[workerID.toString()].send(sendMsg);
+        this.inWorker[workerID]++;
+    
+        return workerID.toString();
+    }
+
+    handleKBInput(workerID, playerID, inputs) {
+        var sendMsg = {
+            msgType: 'kbinput',
+            id: playerID,
+            input: inputs
+        }
+        //cluster.workers[workerID.toString()].send(JSON.stringify(sendMsg));
+        cluster.workers[workerID.toString()].send(sendMsg);
+    }
+
+    handleMouseInput(workerID, playerID) {
+        var sendMsg = {
+            msgType: 'minput',
+            id: playerID
+        }
+        cluster.workers[workerID.toString()].send(sendMsg);
+    }
+
+    removePlayer(workerID, playerID){
+        var sendMsg = {
+            id: playerID,
+            msgType: 'disconnect'
+        }
+        cluster.workers[workerID.toString()].send(JSON.stringify(sendMsg));
+        this.inWorker[workerID]--;
+    }
+
+
+}
