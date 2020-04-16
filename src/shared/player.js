@@ -27,5 +27,35 @@ module.exports = class Player {
             score: this.score
         };
     }
+    /*
+    getTankCorners() {
+        var cos = Math.cos(this.tankAngle);
+        var sin = Math.sin(this.tankAngle);
+        var W = Constants.PLAYER_WIDTH/2;
+        var H = Constants.PLAYER_HEIGHT/2;
+        var topMiddle = {x: this.posx + sin * H, 
+                        y: this.posy - cos * H};
+        var bottomMiddle = {x: this.posx - sin * H, 
+                            y: this.posy + cos * H};
+
+        var topRight = {x: topMiddle.x - cos * W,
+                        y: topMiddle.y - sin * W};
+
+        var topLeft = {x: topMiddle.x + cos * W,
+                       y: topMiddle.y + sin * W};
+
+        var bottomRight = {x: bottomMiddle.x + cos * W,
+                           y: bottomMiddle.y + sin * W};
+
+        var bottomLeft = {x: bottomMiddle.x - cos * W,
+                          y: bottomMiddle.y - sin * W};
+        return {
+            topRight: topRight,
+            topLeft: topLeft,
+            bottomRight: bottomRight,
+            bottomLeft: bottomLeft
+        }
+    }
+    */
 }
 

@@ -192,9 +192,9 @@ module.exports = class Game {
                 }
                 // removes bullets that live too long
                 if (Math.floor((Date.now() - this.players[i].bullets[j].spawnTime)/1000) >= Constants.BULLET_LIFETIME) {
-                    // skip this loop iteration causing this bullet to be destroyed
                     continue
                 }
+                // change player's x and check collision
                 var oldPosx = this.players[i].bullets[j].posx;
                 this.players[i].bullets[j].posx += Constants.BULLET_SPEED * Math.sin(this.players[i].bullets[j].angle);
                 if (this.checkBulletWallCollisions(this.players[i].bullets[j])) {
@@ -208,6 +208,7 @@ module.exports = class Game {
                     var angleChange = (0 - degrees*2) * Math.PI/180;
                     this.players[i].bullets[j].angle += angleChange;
                 }
+                // change player's y and check collision
                 var oldPosy = this.players[i].bullets[j].posy;
                 this.players[i].bullets[j].posy -= Constants.BULLET_SPEED * Math.cos(this.players[i].bullets[j].angle);
                 if (this.checkBulletWallCollisions(this.players[i].bullets[j])) {
