@@ -10,6 +10,7 @@ var maxPlayerCount = 8;
 
 module.exports = class ClusterManager {
     constructor(){
+        this.itr = 0;
         this.length = 0;
         this.inWorker = {};
         cluster.setupMaster({
@@ -25,8 +26,9 @@ module.exports = class ClusterManager {
         });
         var worker = cluster.fork();
         this.length++;
-        console.log("STARTED: " + this.length)
-        this.inWorker[this.length] = 0
+        this.itr++;
+        console.log("STARTED: " + this.itr)
+        this.inWorker[this.itr] = 0
 
         worker.on("message", function(msg){
             //console.log(msg.id)
@@ -67,31 +69,43 @@ module.exports = class ClusterManager {
     GetCluster(){
         return cluster
     }
-
+    gatherInfo() {
+        var ret = []
+        for (var worker in cluster.workers){
+            var r = {
+                id: worker,
+                name: "Server " + worker,
+                playerCount: this.inWorker[worker]
+            }
+            ret.push(r)
+        }
+        console.log(ret)
+        return ret
+    }
     pickWorker() {
         //return newest server for now
         return this.length;
     }
 
-    allocatePlayer(socket, msg) {
-        var workerID = this.pickWorker();
+    allocatePlayer(socket, pName, serverNum) {
+        /*var workerID = this.pickWorker();
         if (this.length < 1 || this.inWorker[workerID] >= maxPlayerCount) {
             this.StartServer();
             workerID = this.pickWorker();
-        }
+        }*/
         var sendMsg = { 
                     id: socket.id,//socket['conn']),
-                    name: msg,
+                    name: pName,
                     msgType: "login"
                   };
         //var outMsg = JSON.stringify(sendMsg);
         //console.log(outMsg);
         sockets[socket.id] = socket;
         console.log("In AllocatePlayer: "+ sockets[socket.id.toString()] + socket.id);
-        cluster.workers[workerID.toString()].send(sendMsg);
-        this.inWorker[workerID]++;
+        cluster.workers[serverNum].send(sendMsg);
+        this.inWorker[serverNum]++;
     
-        return workerID.toString();
+        //return workerID.toString();
     }
 
     handleKBInput(workerID, playerID, inputs) {
@@ -117,7 +131,7 @@ module.exports = class ClusterManager {
             id: playerID,
             msgType: 'disconnect'
         }
-        cluster.workers[workerID.toString()].send(JSON.stringify(sendMsg));
+        cluster.workers[workerID.toString()].send(sendMsg);
         this.inWorker[workerID]--;
     }
 

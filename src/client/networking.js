@@ -1,19 +1,19 @@
 import io from 'socket.io-client';
 import { throttle } from 'throttle-debounce';
-import { movements } from './input';
+import { movements, startCapturingInput } from './input';
 const Constants = require('../shared/constants.js')
 //var Player = require('../shared/player.js');
 var socket;
-
-export function Login(name) {
+var StartGame;
+export function Login(name, gameStart) {
     // login new player
     socket = io();
-    SetupCallbacks();
+    console.log("CONNCTED")
+    StartGame = gameStart;
     socket.emit('login', name);
-    // start a loop to send the server inputs
-    setInterval(function() {
-        socket.emit('kbinput', movements);
-    }, 1000/Constants.FPS);
+    
+    SetupCallbacks();
+    
 }
 
 export var players = {};
@@ -30,6 +30,30 @@ function SetupCallbacks() {
     socket.on('mapUpdate', (msg) => {
         map = JSON.parse(msg);
     });
+    
+    socket.on('joinGameSuccess', () => {
+        // start a loop to send the server inputs
+        setInterval(function() {
+            socket.emit('kbinput', movements);
+        }, 1000/Constants.FPS);
+        StartGame()
+    })
+    socket.on('currentState', (msg) => {
+
+        console.log(msg)
+        var list = document.getElementById("serverList");
+        list.innerHTML = ""
+        var newHTML= ""
+        for(var state in msg) {
+            newHTML += "<li style='list-style-type: none;'>"
+            newHTML += "<input type='submit' id='"+ msg[state].id +"' class = 'btn btn-danger btn-block join_button' name = \"";
+            newHTML += msg[state].id +"\" onclick = 'javascript:document.getElementById(\""+ msg[state].id +"\").value=\"0\"' value = 'Join Server " + msg[state].id +"&nbsp - &nbsp Current Player Count: ";
+            newHTML += msg[state].playerCount + "'>"
+            newHTML += "</li>"
+        }
+        list.innerHTML = newHTML;
+        
+    });
 }
 
 function processUpdate(update) {
@@ -41,6 +65,7 @@ function processUpdate(update) {
     }
 }
 
+
 export function sendMouseInput(event) {
     var playerInfo = {
         x: me.x + Constants.PLAYER_HEIGHT * Math.sin(me.barrel_angle),
@@ -50,4 +75,14 @@ export function sendMouseInput(event) {
     if (playerInfo.angle != undefined && playerInfo.x != undefined && playerInfo.y != undefined) {
         socket.emit('minput', playerInfo);
     }
+}
+
+export function JoinServer(msg) {
+    //alert("TYRING TO JOIN")
+    socket.emit('joinServer', msg)
+}
+
+export function Refresh(event) {
+    //alert("HERE")
+    socket.emit('pullServers');
 }

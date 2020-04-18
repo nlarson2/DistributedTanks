@@ -4,7 +4,7 @@
   "main": "src/client/index.js",
   "scripts": {
     "dev": "parcel src/client/index.html",
-    "prod": "parcel build src/client/index.html --public-url ./",
+    "prod": "parcel build src/client/index.html --public-url ./ & node src\\server\\server.js",
     "start": "node server.js"
   },
   "keywords": [],
@@ -17,6 +17,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "i": "^0.3.6",
     "nodemon": "^2.0.2",
     "parcel": "^1.12.4",
     "socketio": "^1.0.0",

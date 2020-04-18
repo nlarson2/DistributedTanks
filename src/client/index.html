@@ -16,12 +16,23 @@
       <h1 class="display-3 text-center" style="font-family: 'Black Ops One', cursive; padding-top: 100px">Tank Game</h1>
       <div class="login-clean">
         <h2 class="sr-only">Login Form</h2>
-        <div class="container" style="width: 15%;">
-            <div class="col-sm">
+        <div class="container" style="width: 100%;">
+            <div class="col-sm" id = "playerNameForm" style= "">
 	            <div class="form-group ">
                     <input class="form-control" type="text" id="in_game_name" name="in_game_name" placeholder="In game name">
                 </div>
-                <button id="play_button" class="btn btn-danger btn-block">Play</button>
+                <button id="play_button" class="btn btn-danger btn-block" style="width: 15%; margin: auto;">Play</button>
+            </div>
+            <div class="col-lg" id = "joinServerForm" style="display: none;">
+              <form id = "joinForm" style="width: 100%;">
+	            <div class="form-group ">
+                <input id = "TEST" type="text" style="display: none;"/>
+                <table id = "serverList">
+                  
+                </table>
+              </div>
+              </form>
+              <button id='refresh_servers' class='btn btn-danger btn-block' style="width: 15%; margin: auto;">Refresh</button>
             </div>
         </div>
       </div>
@@ -33,5 +44,9 @@
     <div id="game_full" class="hidden">
     </div>
     <script src="./index.js"></script>
+    <script>
+      var list = document.getElementById("TEST")
+      list.addEventListener('change', () => {alert("WORKED FINALLY")})
+    </script>
   </body>
 </html>

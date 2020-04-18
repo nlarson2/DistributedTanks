@@ -6,8 +6,10 @@ const game = new Game();
 
 process.on("message", (msg) => {
     //msg = JSON.parse(msg)
+    //console.log(msg)
     switch(msg.msgType) {
         case "login":
+            //console.log("login")
             game.addPlayer(msg.id, msg.name);
             var loginMsg = {
                 map: game.map,
@@ -23,9 +25,11 @@ process.on("message", (msg) => {
             game.handleMouseInput(msg.id);
             break;
         case "disconnect":
+            console.log("DISCONNECTING")
             game.removePlayer(msg.id);
             break;
         default:
+            console.log("default")
             break;
     }
 })

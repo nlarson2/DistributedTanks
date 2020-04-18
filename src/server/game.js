@@ -49,6 +49,7 @@ module.exports = class Game {
     }
     addPlayer(id, username) {
         //this.sockets[socket.id] = socket;
+        console.log("SOCKET " +id)
         this.players[id] = new Player(id, username);
         // player might spawn inside the wall, so just choose another spawn if it happens
         if (this.checkPlayerWallCollisions(id)) {
@@ -57,6 +58,7 @@ module.exports = class Game {
     }
 
     removePlayer(id) {
+        console.log("SOCKET REM " + id)
         //delete this.sockets[id];
         delete this.players[id];
     }
