@@ -2,6 +2,7 @@
 // https://github.com/vzhou842/example-.io-game/blob/master/src/client/assets.js
 
 module.exports = Object.freeze({
+    
     MAX_ANGLE: Math.PI,
     MIN_ANGLE: -1*Math.PI,
 
@@ -9,7 +10,7 @@ module.exports = Object.freeze({
     PLAYER_TURN_SPEED: 5.0,
     PLAYER_WIDTH: 30,
     PLAYER_HEIGHT: 45,
-    PLAYER_FIRECOOLDOWN: 5.0,
+    PLAYER_FIRECOOLDOWN: 1.0,
 
     BULLET_SPEED: 5.0,
     BULLET_LIFETIME: 5.0,
@@ -19,6 +20,9 @@ module.exports = Object.freeze({
     FPS: 60,
 
     MAP_SIZE: 2000,
+
+    FREEFORALL: 1,
+    TDM: 2,
 
     MSG_TYPES: {
       JOIN_GAME: 'join_game',

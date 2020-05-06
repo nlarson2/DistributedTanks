@@ -117,7 +117,10 @@ module.exports = class Game {
 
 
     handleMouseInput(id, inputs) {
-        this.players[id].bullets.push(new Bullet(this.players[id].barrelAngle, this.players[id].posx, this.players[id].posy, Date.now()));
+        if (Math.floor((Date.now() - this.players[id].lastFire)/1000) >= Constants.PLAYER_FIRECOOLDOWN) {
+            this.players[id].bullets.push(new Bullet(this.players[id].barrelAngle, this.players[id].posx, this.players[id].posy, Date.now()));
+            this.players[id].lastFire = Date.now();
+        }
     }
     /*
     // unoptimized wall collisions: checks all tiles in the map
@@ -164,8 +167,8 @@ module.exports = class Game {
     //added a second parameter to fix the bug causing the same player to hit himself and earn points
     checkBulletPlayerCollisions(bullet, Pnumber) {
         for (var i in this.players) { 
-           if(Pnumber != i) {
-           //    console.log("Pnumber: %i   |   i:  %i   \n", Pnumber, i);
+            if(Pnumber != i) {
+            //    console.log("Pnumber: %i   |   i:  %i   \n", Pnumber, i);
             // get coords of each corner of the player's tank body
             var player_center = {x: this.players[i].posx, y: this.players[i].posy};
             // rotate bullet about player center to realign with axes
@@ -183,29 +186,29 @@ module.exports = class Game {
             if (x < corners.topRight.x && x > corners.topLeft.x &&
                 y > corners.bottomRight.y && y < corners.topRight.y) {
                 this.players[i].health -= 10;
-                
-                
-                    // respawn hit player
-                    if(this.players[i].health <= 0) {
-                this.respawnPlayer(this.players[i]);
-                this.players[i].health = 100;
-                    }
-                return true;
-                    
+                // respawn hit player
+                if(this.players[i].health <= 0) {
+                    this.respawnPlayer(this.players[i]);
+                    this.players[i].health = 100;
+                    return {hit: true, kill: true};
+                }
+                return {hit: true, kill: false};        
             }
         }
     }
-        return false;
-    }
+    return {hit: false, kill: false};
+}
 
     updateBullets() {
         for (var i in this.players) {
             var arr = []
             for (var j = 0; j < this.players[i].bullets.length; j++) {
                 // repawn hit player, increment score, and remove bullet that hits
-                if (this.checkBulletPlayerCollisions(this.players[i].bullets[j], i)) { 
-                   
-                    this.players[i].score += 1;
+                var hitCheck = this.checkBulletPlayerCollisions(this.players[i].bullets[j], i)
+                if (hitCheck.hit) {
+                    if (hitCheck.kill) {
+                        this.players[i].score += 1;
+                    }
                     continue
                 }
                 // removes bullets that live too long

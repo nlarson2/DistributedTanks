@@ -16,6 +16,7 @@ export function Login(name, gameStart) {
     
 }
 
+export var teams = {}
 export var players = {};
 export var me = {};
 export var map = {};
@@ -45,9 +46,18 @@ function SetupCallbacks() {
         list.innerHTML = ""
         var newHTML= ""
         for(var state in msg) {
+            var gametype;
+            console.log("HERE");
+            console.log(msg[state].gametype);
+            if(msg[state].gametype == 1){
+                gametype = "Free For All"
+            } else {
+                gametype = "Team Deathmatch"
+            }
             newHTML += "<li style='list-style-type: none;'>"
             newHTML += "<input type='submit' id='"+ msg[state].id +"' class = 'btn btn-danger btn-block join_button' name = \"";
-            newHTML += msg[state].id +"\" onclick = 'javascript:document.getElementById(\""+ msg[state].id +"\").value=\"0\"' value = 'Join Server " + msg[state].id +"&nbsp - &nbsp Current Player Count: ";
+            newHTML += msg[state].id +"\" onclick = 'javascript:document.getElementById(\""+ msg[state].id +"\").value=\"0\"' value = 'Join Server " + msg[state].id +"&nbsp - "
+            newHTML += gametype +" - &nbsp Current Player Count: ";
             newHTML += msg[state].playerCount + "'>"
             newHTML += "</li>"
         }
@@ -58,6 +68,7 @@ function SetupCallbacks() {
 
 function processUpdate(update) {
     players = update.players;
+    teams = update.teams;
     for (var x in players) {
         if (x == socket.id) {
             me = players[x];

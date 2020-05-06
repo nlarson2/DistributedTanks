@@ -55,16 +55,12 @@ module.exports = class Game {
 
         //
         
-      if(this.playerCount ==0) {
-          this.teams[this.playerCount] = new Team(this.playerCount,'Team 1');
-      }
-      if(this.playerCount ==1) {
-        this.teams[this.playerCount] = new Team(this.playerCount,'Team 2');
-    }
-    
-    
-
-
+        if(this.playerCount ==0) {
+            this.teams[this.playerCount] = new Team(this.playerCount,'Team 1');
+        }
+        if(this.playerCount ==1) {
+            this.teams[this.playerCount] = new Team(this.playerCount,'Team 2');
+        }
         //
         console.log("SOCKET " +id)
         this.players[id] = new Player(id, username);
@@ -149,7 +145,10 @@ module.exports = class Game {
 
 
     handleMouseInput(id, inputs) {
-        this.players[id].bullets.push(new Bullet(this.players[id].barrelAngle, this.players[id].posx, this.players[id].posy, Date.now()));
+        if (Math.floor((Date.now() - this.players[id].lastFire)/1000) >= Constants.PLAYER_FIRECOOLDOWN) {
+            this.players[id].bullets.push(new Bullet(this.players[id].barrelAngle, this.players[id].posx, this.players[id].posy, Date.now()));
+            this.players[id].lastFire = Date.now();
+        }
     }
     /*
     // unoptimized wall collisions: checks all tiles in the map
@@ -197,37 +196,35 @@ module.exports = class Game {
     checkBulletPlayerCollisions(bullet, Pnumber) {
         for (var i in this.players) { 
            if(this.players[i].team != this.players[Pnumber].team) {
-           //    console.log("Pnumber: %i   |   i:  %i   \n", Pnumber, i);
-            // get coords of each corner of the player's tank body
-            var player_center = {x: this.players[i].posx, y: this.players[i].posy};
-            // rotate bullet about player center to realign with axes
-            var rotated_bullet = this.rotatePoint(bullet.posx, bullet.posy, -this.players[i].tankAngle, player_center);
-            // get player tank corners without rotation to realign with axes
-            var W = Constants.PLAYER_WIDTH/2;
-            var H = Constants.PLAYER_HEIGHT/2;
-            var corners = { topRight: {x: this.players[i].posx + W, y: this.players[i].posy + H},
-                            topLeft: {x: this.players[i].posx - W, y: this.players[i].posy + H},
-                            bottomRight: {x: this.players[i].posx + W, y: this.players[i].posy - H},
-                            bottomLeft: {x: this.players[i].posx - W, y: this.players[i].posy - H}}
-            var x = rotated_bullet.x;
-            var y = rotated_bullet.y;
-            
-            if (x < corners.topRight.x && x > corners.topLeft.x &&
-                y > corners.bottomRight.y && y < corners.topRight.y) {
-                this.players[i].health -= 10;
-                
-                
+                //    console.log("Pnumber: %i   |   i:  %i   \n", Pnumber, i);
+                // get coords of each corner of the player's tank body
+                var player_center = {x: this.players[i].posx, y: this.players[i].posy};
+                // rotate bullet about player center to realign with axes
+                var rotated_bullet = this.rotatePoint(bullet.posx, bullet.posy, -this.players[i].tankAngle, player_center);
+                // get player tank corners without rotation to realign with axes
+                var W = Constants.PLAYER_WIDTH/2;
+                var H = Constants.PLAYER_HEIGHT/2;
+                var corners = { topRight: {x: this.players[i].posx + W, y: this.players[i].posy + H},
+                                topLeft: {x: this.players[i].posx - W, y: this.players[i].posy + H},
+                                bottomRight: {x: this.players[i].posx + W, y: this.players[i].posy - H},
+                                bottomLeft: {x: this.players[i].posx - W, y: this.players[i].posy - H}}
+                var x = rotated_bullet.x;
+                var y = rotated_bullet.y;
+                // check collision
+                if (x < corners.topRight.x && x > corners.topLeft.x &&
+                    y > corners.bottomRight.y && y < corners.topRight.y) {
+                    this.players[i].health -= 10;
                     // respawn hit player
                     if(this.players[i].health <= 0) {
-                this.respawnPlayer(this.players[i]);
-                this.players[i].health = 100;
+                        this.respawnPlayer(this.players[i]);
+                        this.players[i].health = 100;
+                        return {hit: true, kill: true};
                     }
-                return true;
-                    
+                    return {hit: true, kill: false};
+                }
             }
         }
-    }
-        return false;
+        return {hit: false, kill: false};
     }
 
     updateBullets() {
@@ -235,9 +232,12 @@ module.exports = class Game {
             var arr = []
             for (var j = 0; j < this.players[i].bullets.length; j++) {
                 // repawn hit player, increment score, and remove bullet that hits
-                if (this.checkBulletPlayerCollisions(this.players[i].bullets[j], i)) { 
-                   
-                    this.players[i].score += 1;
+                var hitCheck = this.checkBulletPlayerCollisions(this.players[i].bullets[j], i)
+                if (hitCheck.hit) { 
+                    if (hitCheck.kill) {
+                        this.players[i].score += 1;
+                        this.teams[this.players[i].team].Tscore += 1;
+                    }
                     continue
                 }
                 // removes bullets that live too long

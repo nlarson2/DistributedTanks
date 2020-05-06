@@ -13,6 +13,7 @@ module.exports = class ClusterManager {
         this.itr = 0;
         this.length = 0;
         this.inWorker = {};
+        this.gameTypes = {};
         cluster.setupMaster({
             exec: './src/server/worker.js'
         });
@@ -24,17 +25,25 @@ module.exports = class ClusterManager {
         cluster.setupMaster({
             exec: './src/server/worker.js'
         });
-        var worker = cluster.fork();
+        var worker = cluster.fork({env: arg});
+        console.log(arg);
         this.length++;
         this.itr++;
-        console.log("STARTED: " + this.itr)
+        //console.log("STARTED: " + this.itr)
         this.inWorker[this.itr] = 0
+        this.gameTypes[this.itr] = arg;
+        /*var gameType;// = arg != null ? arg : 1;
+        if(arg != null)
+            gameType = arg;
+        else
+            gameType = 1;
+        worker.send("start_game", arg)*/
 
         worker.on("message", function(msg){
             //console.log(msg.id)
             switch(msg.msgType) {
                 case "login":
-                    console.log("In worker.on(): " + sockets + msg.id)
+                    //console.log("In worker.on(): " + sockets + msg.id)
                     sockets[msg.id].emit('mapUpdate', JSON.stringify(msg.map));
                     break;
                 case "update":
@@ -43,10 +52,16 @@ module.exports = class ClusterManager {
                     }
                     break;
                 default:
-                    console.log("YOU FUCKED UP");
+                    //console.log("YOU messed UP");
                     break;
             }
         })
+        /*var gameType;// = arg != null ? arg : 1;
+        if(arg != null)
+            gameType = arg;
+        else
+            gameType = 1;
+        worker.eventNames("start_game", arg)*/
     }
     //kill a server
     CloseServer(id) {
@@ -75,7 +90,8 @@ module.exports = class ClusterManager {
             var r = {
                 id: worker,
                 name: "Server " + worker,
-                playerCount: this.inWorker[worker]
+                playerCount: this.inWorker[worker],
+                gametype: this.gameTypes[worker]
             }
             ret.push(r)
         }

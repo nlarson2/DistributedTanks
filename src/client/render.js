@@ -3,7 +3,7 @@
 
 import { debounce } from 'throttle-debounce';
 import { getAsset } from './assets';
-import { players, me, map } from './networking';
+import { players, me, map, teams } from './networking';
 
 const Constants = require('../shared/constants');
 const {PLAYER_WIDTH, PLAYER_HEIGHT } = Constants;

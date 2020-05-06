@@ -7,7 +7,6 @@ module.exports = class Bullet {
         this.angle = angle;
         this.posx = x + Constants.PLAYER_HEIGHT * Math.sin(angle);
         this.posy = y - Constants.PLAYER_HEIGHT * Math.cos(angle);
-    
     }
     
 
