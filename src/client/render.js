@@ -81,7 +81,10 @@ function renderPlayers() {
         // fill is the body, stroke is the body outline
         context.lineWidth = 1;
         context.strokeStyle = "black"
+        if(players[i].team == 0)
         context.fillStyle = "green"
+        if(players[i].team == 1)
+        context.fillStyle = "red"
         context.strokeRect(-PLAYER_WIDTH/2,-PLAYER_HEIGHT/2,PLAYER_WIDTH,PLAYER_HEIGHT);
         context.fillRect(-PLAYER_WIDTH/2,-PLAYER_HEIGHT/2,PLAYER_WIDTH,PLAYER_HEIGHT);
         /*
@@ -104,9 +107,10 @@ function renderPlayers() {
         // fill is the barrel, stroke is the barrel outline
         context.lineWidth = 1;
         context.strokeStyle = "black"
-        
+        if(players[i].team == 0)
         context.fillStyle = "green"
-        
+        if(players[i].team == 1)
+        context.fillStyle = "red"
         context.strokeRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT);
         context.fillRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT);
         context.restore();
@@ -120,8 +124,10 @@ function renderBullets(socket) {
         context.rotate(players[socket].bullets[i].angle);
         context.lineWidth = 1;
         context.strokeStyle = "black"
-        
-        context.fillStyle = "white"
+        if(players[socket].team == 0)
+        context.fillStyle = "green"
+        if(players[socket].team == 1)
+        context.fillStyle = "red"
         context.strokeRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT/4);
         context.fillRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT/4);
         context.restore();
