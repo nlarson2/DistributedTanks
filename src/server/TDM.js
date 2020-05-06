@@ -3,13 +3,15 @@
 
 const Player = require('./../shared/player');
 const Bullet = require('./../shared/bullet');
-
+const Team = require('./../shared/Team');
 var Constants = require('../shared/constants.js');
 
 module.exports = class Game {
     constructor() {
         //this.sockets = {};
         this.players = {};
+        this.teams = {};
+        this.playerCount = 0;
         this.map = {
             cols: 30,
             rows: 30,
@@ -50,12 +52,24 @@ module.exports = class Game {
     }
     addPlayer(id, username) {
         //this.sockets[socket.id] = socket;
+
+        //
+        
+      if(this.playerCount ==0) {
+          this.teams[this.playerCount] = new Team(this.playerCount,'Team 1');
+      }
+      if(this.playerCount ==1) {
+        this.teams[this.playerCount] = new Team(this.playerCount,'Team 2');
+    }
+    
     
 
 
         //
         console.log("SOCKET " +id)
         this.players[id] = new Player(id, username);
+        this.TeamingUp(id, this.playerCount);
+        this.playerCount++;
         // player might spawn inside the wall, so just choose another spawn if it happens
         if (this.checkPlayerWallCollisions(id)) {
             this.respawnPlayer(this.players[id]);
@@ -66,6 +80,24 @@ module.exports = class Game {
         console.log("SOCKET REM " + id)
         //delete this.sockets[id];
         delete this.players[id];
+    }
+    //NEW **HERE
+    TeamingUp(PlayerID, playerCount) {
+        if(playerCount%2 == 0) {
+            //team 1
+            this.teams[playerCount%2].playersID[playerCount] = PlayerID;
+            this.players[PlayerID].team = 0; 
+
+
+        }
+        else {
+            //team 2
+            this.teams[playerCount%2].playersID[playerCount] = PlayerID;
+            this.players[PlayerID].team = 1; 
+
+
+        }
+
     }
     handleKBInput(id, inputs) {
         this.players[id].barrelAngle = inputs.mouseAngle;
@@ -164,7 +196,7 @@ module.exports = class Game {
     //added a second parameter to fix the bug causing the same player to hit himself and earn points
     checkBulletPlayerCollisions(bullet, Pnumber) {
         for (var i in this.players) { 
-           if(Pnumber != i) {
+           if(this.players[i].team != this.players[Pnumber].team) {
            //    console.log("Pnumber: %i   |   i:  %i   \n", Pnumber, i);
             // get coords of each corner of the player's tank body
             var player_center = {x: this.players[i].posx, y: this.players[i].posy};

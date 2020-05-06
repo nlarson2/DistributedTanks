@@ -33,10 +33,13 @@ export function renderGame() {
 
     renderLeaderboard();
 
+    renderhealth();
+
     window.requestAnimationFrame(renderGame);
 }
 
 function renderMap() {
+    
     for (var i = 0; i < map.cols; i++) {
         for (var j = 0; j < map.rows; j++) {
             var tile = map.tiles[i][j];
@@ -101,7 +104,9 @@ function renderPlayers() {
         // fill is the barrel, stroke is the barrel outline
         context.lineWidth = 1;
         context.strokeStyle = "black"
+        
         context.fillStyle = "green"
+        
         context.strokeRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT);
         context.fillRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT);
         context.restore();
@@ -115,6 +120,7 @@ function renderBullets(socket) {
         context.rotate(players[socket].bullets[i].angle);
         context.lineWidth = 1;
         context.strokeStyle = "black"
+        
         context.fillStyle = "white"
         context.strokeRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT/4);
         context.fillRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT/4);
@@ -123,20 +129,78 @@ function renderBullets(socket) {
 }
 
 function renderLeaderboard() {
-    context.font = "20px Verdana";
-    var x_spacing = canvas.width-300;
+   
+    context.font = "18px Verdana";
+    var x_spacing = canvas.width-200;
     var y_spacing = 20;
-    context.fillText("Players:", x_spacing, y_spacing);
-    for (var x in players) {
+    var array = [], pid=[];
+    var count = 0;
+    context.globalAlpha = 0.2;
+    context.fillStyle = "black";
+    context.fillRect(x_spacing,y_spacing, 180, 250);
+    context.restore();
+    context.globalAlpha = 1.0; 
+   
+   for(var i in players) {
+        array[count] = players[i].score;
+        pid[count++] = i;
+    }
+    for (let i = 0; i < array.length; i++) {
+        let temp = array[i];
+        let j;
+        let pidTemp = pid[i];
+        for (j = i - 1; j >= 0 && array[j] < temp; j--) {
+            array[j + 1] = array[j];
+            pid[j+1] = pid[j];
+    
+        }
+        array[j + 1] = temp;
+        pid[j+1] = pidTemp;
+    }
+    for(let i = 0; i < array.length;i++) {
         y_spacing+=20;
-        if (x == me.socket_id) {
-            context.fillText('*' + players[x].name + '* - ' + players[x].score, x_spacing, y_spacing);
-        } else {
-            context.fillText(players[x].name + ' - ' + players[x].score, x_spacing, y_spacing);
+
+            if(pid[i] == me.socket_id ) {
+                context.fillStyle = "#cf3530";
+                context.fillText((i+1)+'-  ' + players[pid[i]].name + '   Pts: '+ array[i] ,x_spacing,y_spacing);
+            }
+            else {
+                context.fillStyle = "white";
+                context.fillText((i+1)+'-  ' +  players[pid[i]].name + '   Pts: '+ array[i] ,x_spacing,y_spacing);
+
+            }
+    }
+}
+function renderhealth(){
+    var x = canvas.width/6;
+    var y = 30;
+    var res;
+    context.fillStyle = '#000000';
+    context.fillRect(x,y,100,y);
+    for(var i in players) {
+        if(i == me.socket_id) {
+            if(players[i].health <= 100 && players[i].health >=76) {
+                context.fillStyle = '#18732c';
+            }
+            if(players[i].health <= 75 && players[i].health >=51) {
+                context.fillStyle = '#49d439';
+            }
+            if(players[i].health <= 50 && players[i].health >=26) {
+                context.fillStyle = '#c2b940';
+            }
+            if(players[i].health <= 25 && players[i].health >=0) {
+                context.fillStyle = '#c22017';
+            }
+          
+
+        res = players[i].health/100.0*98.0;
+
+            context.fillRect(x+1,y+1, res,28);
+
+            context.restore();
         }
     }
 }
-
 export function startRendering() {
     window.requestAnimationFrame(renderGame);
 }

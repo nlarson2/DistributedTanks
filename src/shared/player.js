@@ -13,6 +13,8 @@ module.exports = class Player {
         this.barrelAngle = 0;
         this.bullets = [];
         this.score = 0;
+        this.health = 100;
+        this.team = 0;
     }
 
     toJSON() {
@@ -24,7 +26,9 @@ module.exports = class Player {
             tank_angle: this.tankAngle,
             barrel_angle: this.barrelAngle,
             bullets: this.bullets,
-            score: this.score
+            score: this.score,
+            health: this.health,
+            team: this.team
         };
     }
     /*
