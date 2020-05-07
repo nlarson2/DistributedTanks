@@ -17,6 +17,7 @@ const game = new Game();
 const ClusterManager = require('./ClusterManager');
 var cm = new ClusterManager();
 cm.StartServer(1)
+cm.StartServer(2)
 /*Web Server*/
 var port = 44444
 app.use(bodyParser.urlencoded({extended:true}))
@@ -45,7 +46,7 @@ io.on('connection', function(socket) {
         //console.log("FROM: "+ game.players[socket.id].id + " : " + game.players[socket.id].name);
         //socket.emit('mapUpdate', JSON.stringify(game.map));
         try{
-        console.log(msg);
+       // console.log(msg);
         name = msg;
         ioAdmin.emit("currentState", cm.gatherInfo());
         socket.emit("currentState", cm.gatherInfo());
@@ -61,7 +62,7 @@ io.on('connection', function(socket) {
     });
     socket.on('joinServer', function(msg){
         try{
-        console.log(msg)
+        //console.log(msg)
         currentServer = cm.allocatePlayer(socket, name, msg);
         currentServer = msg
         socket.emit("joinGameSuccess")
@@ -69,7 +70,7 @@ io.on('connection', function(socket) {
     });
     socket.on('pullServers', function() {
         try{
-        console.log("msg recv");
+        //console.log("msg recv");
         socket.emit("currentState", cm.gatherInfo())
         } catch(error){}
     });

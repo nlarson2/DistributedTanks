@@ -74,6 +74,10 @@ module.exports = class Game {
     removePlayer(id) {
         console.log("SOCKET REM " + id)
         //delete this.sockets[id];
+        if(this.players[id].team == 0)
+            this.teams[0].playerCount--;
+        else
+            this.teams[1].playerCount--;
         delete this.players[id];
     }
     //NEW **HERE
@@ -82,16 +86,36 @@ module.exports = class Game {
         
         if(temp == 0) { console.log(this.bluet);
             //team 1
-            this.teams[temp].playersID[this.redt-1] = PlayerID;
-            this.players[PlayerID].team = 0; 
-            this.redt =0;
+            if(this.teams[0].playerCount <= this.teams[1].playerCount ) {
+                this.teams[temp].playersID[this.teams[0].inc] = PlayerID;
+                this.players[PlayerID].team = 0; 
+                this.redt =0;
+                this.teams[0].playerCount++;
+                this.teams[0].inc++;
+            } else {
+                this.teams[1].playersID[this.teams[1].inc] = PlayerID;
+                this.players[PlayerID].team = 1; 
+                this.bluet = 0;
+                this.teams[1].playerCount++
+                this.teams[1].inc++;
+            }
         }
         else {
             //team 2
             console.log(this.bluet, this.redt);
-            this.teams[temp].playersID[this.bluet-1] = PlayerID;
-            this.players[PlayerID].team = 1; 
-            this.bluet = 0;
+            if(this.teams[1].playerCount <= this.teams[0].playerCount ) {
+                this.teams[temp].playersID[this.teams[1].inc] = PlayerID;
+                this.players[PlayerID].team = 1; 
+                this.bluet = 0;
+                this.teams[1].playerCount++
+                this.teams[1].inc++;
+            } else {
+                this.teams[0].playersID[this.teams[0].inc] = PlayerID;
+                this.players[PlayerID].team = 0; 
+                this.redt =0;
+                this.teams[0].playerCount++;
+                this.teams[0].inc++;
+            }
 
         }
 

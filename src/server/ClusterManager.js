@@ -26,7 +26,7 @@ module.exports = class ClusterManager {
             exec: './src/server/worker.js'
         });
         var worker = cluster.fork({env: arg});
-        console.log(arg);
+        //console.log(arg);
         this.length++;
         this.itr++;
         //console.log("STARTED: " + this.itr)
@@ -95,7 +95,7 @@ module.exports = class ClusterManager {
             }
             ret.push(r)
         }
-        console.log(ret)
+        //console.log(ret)
         return ret
     }
     pickWorker() {

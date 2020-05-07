@@ -6,6 +6,8 @@ module.exports = class Team {
         this.Tname = Tname;
         this.Tscore = 0;
         this.playersID = [];
+        this.playerCount = 0;
+        this.inc = 0;
 
     }
 
