@@ -238,7 +238,7 @@ module.exports = class Game {
                 // check collision
                 if (x < corners.topRight.x && x > corners.topLeft.x &&
                     y > corners.bottomRight.y && y < corners.topRight.y) {
-                    this.players[i].health -= 10;
+                    this.players[i].health -= Constants.BULLET_DAMAGE;
                     // respawn hit player
                     if(this.players[i].health <= 0) {
                         this.respawnPlayer(this.players[i]);
