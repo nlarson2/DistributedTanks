@@ -10,7 +10,7 @@ const {PLAYER_WIDTH, PLAYER_HEIGHT } = Constants;
 
 const canvas = document.getElementById('game_canvas');
 const context = canvas.getContext('2d');
-
+var tstate = 0;
 
 setCanvasDimensions();
 
@@ -26,10 +26,15 @@ window.addEventListener('resize', debounce(40, setCanvasDimensions));
 export function renderGame() {
     // clear canvas
     context.clearRect(0, 0, canvas.width, canvas.height);
-
+  
+   
     renderMap();
 
     renderPlayers();
+    if(tstate){
+    renderTeamsS();
+    renderTeamMembers();
+    }
 
     renderLeaderboard();
 
@@ -50,6 +55,12 @@ function renderMap() {
                     var image = getAsset('tile.jpg');
                 } else if (tile == 2) {
                     var image = getAsset('wall.jpg');
+                } else if(tile == 3){
+                    var image = getAsset('brick.png');
+                } else if(tile == 4){
+                    var image = getAsset('icy.png');
+                } else if(tile == 5){
+                    var image = getAsset('lava.png');
                 }
                 context.save();
                 context.translate(canvas.width/2 + x, canvas.height/2 + y);
@@ -69,6 +80,71 @@ function renderMap() {
         }
     }
 }
+function renderTeamsS() {
+    var x = canvas.width/3;
+    var y = 10;
+    var xx = x+10;
+
+    context.globalAlpha = 0.4;
+    context.fillStyle = "black";
+    context.fillRect(x,y, 450, 70);
+    context.restore();
+    context.globalAlpha = 1.0; 
+    context.font = "40px Impact";
+    context.fillStyle = "#cc0000";
+    for(var i in teams) {
+        if(i==0){
+        context.fillText(teams[i].Tname + '  '+ teams[i].Tscore + '              v',xx,60);
+        xx += 210;
+        context.fillStyle = "#0000e6";}
+        else {
+            context.fillText('s             ' +teams[i].Tscore + '  '+  teams[i].Tname ,xx,60);
+        }
+    }
+
+}
+function renderTeamMembers() {
+
+
+    var x = (canvas.width-canvas.width)+20;
+    var y = canvas.height - 300;
+    var xx = x+10;
+    var yy = y +20;
+    var counter = 0;
+
+
+    context.globalAlpha = 0.2;
+    context.fillStyle = "red";
+    context.fillRect(x,y, 180, 250);
+    context.restore();
+    context.globalAlpha = 1.0; 
+    context.font = "20px Impact";
+
+    x = canvas.width-200;
+    xx = x-30;
+    context.globalAlpha = 0.2;
+    context.fillStyle = "blue";
+    context.fillRect(x,y, 180, 250);
+    context.restore();
+    context.globalAlpha = 1.0; 
+    for(var i in players) {
+        if(players[i].team ==0){ context.fillStyle = "#ff6666";
+            x = (canvas.width-canvas.width)+20;
+            xx = x+10;
+        context.fillText(players[i].name,xx,yy+(counter*10));
+
+        }
+        if(players[i].team ==1){ context.fillStyle = "#66c2ff";
+            x = canvas.width-160;
+            xx = x-30;
+        context.fillText(players[i].name,xx,yy+(counter*10));
+
+        }
+        counter++;
+    }
+
+
+}
 
 function renderPlayers() {
     for (var i in players) {
@@ -82,11 +158,13 @@ function renderPlayers() {
         context.lineWidth = 1;
         context.strokeStyle = "black"
         if(players[i].team == 0)
-        context.fillStyle = "green"
-        if(players[i].team == 1)
         context.fillStyle = "red"
+        if(players[i].team == 1)
+        context.fillStyle = "blue"
         context.strokeRect(-PLAYER_WIDTH/2,-PLAYER_HEIGHT/2,PLAYER_WIDTH,PLAYER_HEIGHT);
         context.fillRect(-PLAYER_WIDTH/2,-PLAYER_HEIGHT/2,PLAYER_WIDTH,PLAYER_HEIGHT);
+        if(players[i].tstate)
+        tstate = 1;
         /*
         var image = getAsset('tank.svg');
         context.drawImage(
@@ -108,9 +186,9 @@ function renderPlayers() {
         context.lineWidth = 1;
         context.strokeStyle = "black"
         if(players[i].team == 0)
-        context.fillStyle = "green"
+        context.fillStyle = "#ff6666"
         if(players[i].team == 1)
-        context.fillStyle = "red"
+        context.fillStyle = "#66c2ff"
         context.strokeRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT);
         context.fillRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT);
         context.restore();
@@ -125,9 +203,9 @@ function renderBullets(socket) {
         context.lineWidth = 1;
         context.strokeStyle = "black"
         if(players[socket].team == 0)
-        context.fillStyle = "green"
-        if(players[socket].team == 1)
         context.fillStyle = "red"
+        if(players[socket].team == 1)
+        context.fillStyle = "blue"
         context.strokeRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT/4);
         context.fillRect(-PLAYER_WIDTH/8,0,PLAYER_WIDTH/4,-PLAYER_HEIGHT/4);
         context.restore();
@@ -162,7 +240,9 @@ function renderLeaderboard() {
         }
         array[j + 1] = temp;
         pid[j+1] = pidTemp;
-    }
+    }  y_spacing+=20;
+    context.fillStyle = "#ffad33";
+    context.fillText('LEADERBOARD' ,x_spacing,y_spacing);
     for(let i = 0; i < array.length;i++) {
         y_spacing+=20;
 
@@ -178,7 +258,7 @@ function renderLeaderboard() {
     }
 }
 function renderhealth(){
-    var x = canvas.width/6;
+    var x = canvas.width/7;
     var y = 30;
     var res;
     context.fillStyle = '#000000';

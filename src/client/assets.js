@@ -2,7 +2,10 @@ import tank from '../../public/assets/tank.svg'
 import bullet from '../../public/assets/bullet.svg'
 import tile from '../../public/assets/images/tile.jpg'
 import wall from '../../public/assets/images/wall.jpg'
-const ASSET_NAMES = ['tank.svg', 'bullet.svg', 'tile.jpg', 'wall.jpg'];
+import brick from '../../public/assets/images/brick.png'
+import icy from '../../public/assets/images/icy.png'
+import lava from '../../public/assets/images/lava.png' 
+const ASSET_NAMES = ['tank.svg', 'bullet.svg', 'tile.jpg', 'wall.jpg', 'brick.png', 'icy.png', 'lava.png'];
 const assets = [];
 
 export function loadAssets() {
@@ -37,6 +40,29 @@ export function loadAssets() {
     assets[ASSET_NAMES[3]] = img4;
   }
   img4.src = `/${wall}`;
+
+   //load wall.jpg
+   var img5 = new Image();
+   img5.onload = () => {
+     console.log(`Downloading ${brick}`);
+     assets[ASSET_NAMES[4]] = img5;
+   }
+   img5.src = `/${brick}`;
+
+   //load icy.jpg
+   var img6 = new Image();
+   img6.onload = () => {
+     console.log(`Downloading ${icy}`);
+     assets[ASSET_NAMES[5]] = img6;
+   }
+   img6.src = `/${icy}`;
+     //load lava.jpg
+     var img7 = new Image();
+     img7.onload = () => {
+       console.log(`Downloading ${lava}`);
+       assets[ASSET_NAMES[6]] = img7;
+     }
+     img7.src = `/${lava}`;
 }
 
 export const getAsset = assetName => assets[assetName];

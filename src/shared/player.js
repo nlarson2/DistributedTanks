@@ -16,6 +16,7 @@ module.exports = class Player {
         this.health = 100;
         this.team = 0;
         this.lastFire = 0;
+        this.tstate = 0;
     }
 
     toJSON() {
@@ -29,7 +30,8 @@ module.exports = class Player {
             bullets: this.bullets,
             score: this.score,
             health: this.health,
-            team: this.team
+            team: this.team,
+            tstate: this.tstate
         };
     }
     /*
