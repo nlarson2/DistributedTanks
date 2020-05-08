@@ -1,5 +1,9 @@
 const express = require("express")
 const app = express()
+
+//const { UserInfo } = require("./playerinfo");
+//const userdata = new UserInfo();
+
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
@@ -47,9 +51,12 @@ io.on('connection', function(socket) {
         //socket.emit('mapUpdate', JSON.stringify(game.map));
         try{
        // console.log(msg);
-        name = msg;
-        ioAdmin.emit("currentState", cm.gatherInfo());
-        socket.emit("currentState", cm.gatherInfo());
+		
+		//if (userdata.isPlayerID()) {
+        		name = msg;
+        		ioAdmin.emit("currentState", cm.gatherInfo());
+        		socket.emit("currentState", cm.gatherInfo());
+		//}
         } catch(error){}
     });
     socket.on('logout', function(msg){
